@@ -5,18 +5,20 @@ import type {
   ProductItem,
   QuotationDocument,
 } from '../types/quotation';
+import { SUKITEX_LOGO_DATA_URL } from './logoBase64';
 
 export const DEFAULT_COMPANY_INFO: CompanyInfo = {
-  brandName: 'SUKITEX',
-  tagline: 'Confección Textil & Uniformes Corporativos B2B',
-  legalName: 'SUKITEX PERÚ S.A.C.',
+  brandName: 'SUKITEX S.A.C.',
+  tagline: 'Fabricación de Prendas de Vestir',
+  legalName: 'SUKITEX S.A.C.',
   ruc: '20608945123',
   address: 'Daniel A. Carrión 173, Lurigancho - Chosica, Lima - Perú',
   phone: '+51 948 669 513',
   email: 'ventas@sukitex.pe',
   website: 'www.sukitex.pe',
+  logoUrl: SUKITEX_LOGO_DATA_URL,
   signerName: 'Área Comercial & Proyectos B2B',
-  signerRole: 'SUKITEX · Confecciones Corporativas',
+  signerRole: 'SUKITEX S.A.C. · Fabricación de Prendas de Vestir',
 };
 
 export const DEFAULT_BANK_ACCOUNTS: BankAccount[] = [

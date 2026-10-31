@@ -7,69 +7,41 @@ import {
   formatSizeBreakdownSummary,
   numberToSpanishWords,
 } from '../utils/calculations';
+import { SUKITEX_LOGO_DATA_URL } from '../data/logoBase64';
 
 interface QuotationPreviewProps {
   doc: QuotationDocument;
   previewRef?: React.RefObject<HTMLDivElement | null>;
 }
 
-export const SukitexLogoSvg: React.FC<{ darkBg?: boolean; className?: string }> = ({
-  darkBg = true,
-  className = 'h-12',
-}) => (
-  <div className={`inline-flex items-center gap-3 select-none ${className}`}>
-    <svg
-      viewBox="0 0 56 56"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="w-12 h-12 shrink-0"
-    >
-      <rect
-        x="2"
-        y="2"
-        width="52"
-        height="52"
-        rx="10"
-        fill={darkBg ? '#2A3329' : '#1F261E'}
-        stroke="#EBA552"
-        strokeWidth="2.2"
-      />
-      {/* Stylized textile weave / needle & thread monogram S */}
-      <path
-        d="M36 16H22C19.2386 16 17 18.2386 17 21V23.5C17 26.2614 19.2386 28.5 22 28.5H34C36.7614 28.5 39 30.7386 39 33.5V36C39 38.7614 36.7614 41 34 41H19"
-        stroke="#EBA552"
-        strokeWidth="3.5"
-        strokeLinecap="round"
-      />
-      <path
-        d="M14 28.5H42"
-        stroke={darkBg ? '#F8F5F1' : '#FFFFFF'}
-        strokeWidth="1.5"
-        strokeDasharray="3 3"
-        strokeLinecap="round"
-      />
-      <circle cx="37" cy="16" r="2.5" fill="#EBA552" />
-      <circle cx="19" cy="41" r="2.5" fill="#EBA552" />
-    </svg>
-    <div className="flex flex-col">
-      <span
-        className={`text-2xl font-extrabold tracking-[0.22em] leading-none ${
-          darkBg ? 'text-white' : 'text-[#1F261E]'
-        }`}
-      >
-        {/** Brand Name */}
-        SUKITEX
-      </span>
-      <span
-        className={`text-[9.5px] uppercase tracking-[0.18em] mt-1 font-medium ${
-          darkBg ? 'text-[#EBA552]' : 'text-[#9A6522]'
-        }`}
-      >
-        Confección Corporativa
-      </span>
+export const SukitexLogoImg: React.FC<{
+  logoUrl?: string;
+  darkBg?: boolean;
+  className?: string;
+}> = ({ logoUrl, darkBg = false, className = 'h-14' }) => {
+  const src = logoUrl || SUKITEX_LOGO_DATA_URL;
+
+  return (
+    <div className={`inline-flex items-center ${className}`}>
+      {/* If on dark background, render crisp card backdrop so the original green & charcoal brand colors shine clearly */}
+      {darkBg ? (
+        <div className="bg-white/95 rounded-lg px-3 py-1.5 shadow-sm border border-emerald-500/30 flex items-center">
+          <img
+            src={src}
+            alt="SUKITEX S.A.C."
+            className="h-11 max-w-[240px] object-contain"
+          />
+        </div>
+      ) : (
+        <img
+          src={src}
+          alt="SUKITEX S.A.C."
+          className="h-14 max-w-[270px] object-contain"
+        />
+      )}
     </div>
-  </div>
-);
+  );
+};
 
 export const QuotationPreview: React.FC<QuotationPreviewProps> = ({ doc, previewRef }) => {
   const isCorporate = doc.theme === 'corporate';
@@ -98,37 +70,19 @@ export const QuotationPreview: React.FC<QuotationPreviewProps> = ({ doc, preview
       <div>
         {/* HEADER */}
         {isCorporate ? (
-          <div className="bg-[#1F261E] text-white px-9 py-7 border-b-4 border-[#EBA552]">
+          <div className="bg-[#1D2523] text-white px-9 py-6 border-b-4 border-[#48A987]">
             <div className="flex items-start justify-between gap-6">
               {/* Brand & Company Details */}
               <div className="flex-1">
-                {doc.company.logoUrl ? (
-                  <div className="flex items-center gap-3.5 mb-3">
-                    <img
-                      src={doc.company.logoUrl}
-                      alt={doc.company.brandName}
-                      className="max-h-14 max-w-[200px] object-contain rounded bg-white/5 p-1"
-                    />
-                    <div>
-                      <h1 className="text-2xl font-extrabold tracking-[0.18em] text-white">
-                        {doc.company.brandName}
-                      </h1>
-                      <p className="text-[10.5px] text-[#EBA552] uppercase tracking-wider font-medium">
-                        {doc.company.tagline}
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="mb-3">
-                    <SukitexLogoSvg darkBg={true} />
-                  </div>
-                )}
+                <div className="mb-2">
+                  <SukitexLogoImg logoUrl={doc.company.logoUrl} darkBg={true} />
+                </div>
 
                 <div className="text-[11px] text-gray-300 space-y-0.5 mt-2">
                   <p className="font-semibold text-white">
                     {doc.company.legalName}{' '}
                     {doc.company.ruc && (
-                      <span className="text-[#EBA552] font-mono ml-1.5">
+                      <span className="text-[#48A987] font-mono ml-1.5 font-bold">
                         · RUC: {doc.company.ruc}
                       </span>
                     )}
@@ -149,8 +103,8 @@ export const QuotationPreview: React.FC<QuotationPreviewProps> = ({ doc, preview
               </div>
 
               {/* Quotation Number Box */}
-              <div className="bg-[#2A3329] border border-[#EBA552]/60 rounded-lg px-5 py-3.5 text-right min-w-[235px] shrink-0">
-                <div className="text-[10px] uppercase tracking-[0.16em] text-[#EBA552] font-bold">
+              <div className="bg-[#26312E] border border-[#48A987]/60 rounded-lg px-5 py-3.5 text-right min-w-[235px] shrink-0 shadow-inner">
+                <div className="text-[10px] uppercase tracking-[0.16em] text-[#48A987] font-bold">
                   {isOrderMode ? 'Cotización Comercial B2B' : 'Tarifario / Cotización por Talla'}
                 </div>
                 <div className="text-xl font-extrabold tracking-wider text-white font-mono mt-0.5">
@@ -163,7 +117,7 @@ export const QuotationPreview: React.FC<QuotationPreviewProps> = ({ doc, preview
                   </div>
                   <div className="flex justify-between gap-4">
                     <span className="text-gray-400">Válido hasta:</span>
-                    <span className="font-medium text-[#EBA552]">{doc.validUntilDate}</span>
+                    <span className="font-medium text-[#48A987]">{doc.validUntilDate}</span>
                   </div>
                   <div className="flex justify-between gap-4">
                     <span className="text-gray-400">Moneda / Imp.:</span>
@@ -177,36 +131,18 @@ export const QuotationPreview: React.FC<QuotationPreviewProps> = ({ doc, preview
           </div>
         ) : (
           /* CLEAN / ECO-PRINT HEADER */
-          <div className="px-9 pt-7 pb-5 border-b-2 border-[#1F261E]">
+          <div className="px-9 pt-6 pb-5 border-b-2 border-[#48A987]">
             <div className="flex items-start justify-between gap-6">
               <div className="flex-1">
-                {doc.company.logoUrl ? (
-                  <div className="flex items-center gap-3.5 mb-2.5">
-                    <img
-                      src={doc.company.logoUrl}
-                      alt={doc.company.brandName}
-                      className="max-h-14 max-w-[200px] object-contain"
-                    />
-                    <div>
-                      <h1 className="text-2xl font-extrabold tracking-[0.18em] text-[#1F261E]">
-                        {doc.company.brandName}
-                      </h1>
-                      <p className="text-[10.5px] text-[#9A6522] uppercase tracking-wider font-semibold">
-                        {doc.company.tagline}
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="mb-2.5">
-                    <SukitexLogoSvg darkBg={false} />
-                  </div>
-                )}
+                <div className="mb-2">
+                  <SukitexLogoImg logoUrl={doc.company.logoUrl} darkBg={false} />
+                </div>
 
                 <div className="text-[11px] text-gray-700 space-y-0.5 mt-2">
-                  <p className="font-bold text-[#1F261E]">
+                  <p className="font-bold text-[#1D2523]">
                     {doc.company.legalName}{' '}
                     {doc.company.ruc && (
-                      <span className="font-mono text-gray-800 ml-1">
+                      <span className="font-mono text-gray-800 ml-1 font-semibold">
                         · RUC: {doc.company.ruc}
                       </span>
                     )}
@@ -226,11 +162,11 @@ export const QuotationPreview: React.FC<QuotationPreviewProps> = ({ doc, preview
                 </div>
               </div>
 
-              <div className="border-2 border-[#1F261E] rounded-lg px-5 py-3 text-right min-w-[235px] shrink-0">
-                <div className="text-[10px] uppercase tracking-[0.15em] text-[#9A6522] font-extrabold">
+              <div className="border-2 border-[#48A987] rounded-lg px-5 py-3 text-right min-w-[235px] shrink-0 bg-white">
+                <div className="text-[10px] uppercase tracking-[0.15em] text-[#2E7A60] font-extrabold">
                   {isOrderMode ? 'Cotización Comercial B2B' : 'Tarifario / Cotización por Talla'}
                 </div>
-                <div className="text-xl font-extrabold tracking-wider text-[#1F261E] font-mono mt-0.5">
+                <div className="text-xl font-extrabold tracking-wider text-[#1D2523] font-mono mt-0.5">
                   {doc.number || 'COT-0001'}
                 </div>
                 <div className="mt-2 pt-1.5 border-t border-gray-200 text-[10.5px] space-y-0.5 text-gray-700">
@@ -255,11 +191,11 @@ export const QuotationPreview: React.FC<QuotationPreviewProps> = ({ doc, preview
         )}
 
         {/* CLIENT & PROJECT BAR */}
-        <div className="px-9 py-4">
+        <div className="px-9 py-3.5">
           <div
             className={`rounded-lg border p-3.5 grid grid-cols-12 gap-x-5 gap-y-2 ${
               isCorporate
-                ? 'bg-[#F8F5F1] border-[#E5E0D8]'
+                ? 'bg-[#F7FAF8] border-[#D8E5DF]'
                 : 'bg-white border-gray-300'
             }`}
           >
@@ -268,7 +204,7 @@ export const QuotationPreview: React.FC<QuotationPreviewProps> = ({ doc, preview
                 <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 w-20 shrink-0">
                   Cliente:
                 </span>
-                <span className="font-bold text-[12.5px] text-[#1F261E]">
+                <span className="font-bold text-[12.5px] text-[#1D2523]">
                   {doc.client.companyName || '—'}
                 </span>
               </div>
@@ -305,7 +241,7 @@ export const QuotationPreview: React.FC<QuotationPreviewProps> = ({ doc, preview
                   <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 w-20 shrink-0">
                     Proyecto:
                   </span>
-                  <span className="font-semibold text-[#1F261E] text-[11.5px]">
+                  <span className="font-semibold text-[#1D2523] text-[11.5px]">
                     {doc.client.projectReference}
                   </span>
                 </div>
@@ -345,8 +281,8 @@ export const QuotationPreview: React.FC<QuotationPreviewProps> = ({ doc, preview
             <div
               className={`grid grid-cols-12 px-3.5 py-2 text-[10px] font-bold uppercase tracking-wider ${
                 isCorporate
-                  ? 'bg-[#1F261E] text-white'
-                  : 'bg-gray-100 text-[#1F261E] border-b border-gray-300'
+                  ? 'bg-[#1D2523] text-white'
+                  : 'bg-gray-100 text-[#1D2523] border-b border-gray-300'
               }`}
             >
               <div className={isOrderMode ? 'col-span-5' : 'col-span-6'}>
@@ -385,7 +321,7 @@ export const QuotationPreview: React.FC<QuotationPreviewProps> = ({ doc, preview
                     {/* Product Parent Header & Technical Specs */}
                     <div
                       className={`p-3.5 border-b border-gray-200 ${
-                        isCorporate ? 'bg-[#FDFBF8]' : 'bg-gray-50/70'
+                        isCorporate ? 'bg-[#FAFCFB]' : 'bg-gray-50/70'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-4">
@@ -394,7 +330,7 @@ export const QuotationPreview: React.FC<QuotationPreviewProps> = ({ doc, preview
                             <span
                               className={`inline-flex items-center justify-center px-2 py-0.5 rounded text-[10px] font-extrabold font-mono ${
                                 isCorporate
-                                  ? 'bg-[#1F261E] text-[#EBA552]'
+                                  ? 'bg-[#1D2523] text-[#48A987]'
                                   : 'bg-gray-800 text-white'
                               }`}
                             >
@@ -406,11 +342,11 @@ export const QuotationPreview: React.FC<QuotationPreviewProps> = ({ doc, preview
                               </span>
                             )}
                             {product.category && (
-                              <span className="text-[10px] font-semibold text-[#9A6522] bg-[#FDF6EC] border border-[#EBA552]/40 px-2 py-0.5 rounded">
+                              <span className="text-[10px] font-semibold text-[#2E7A60] bg-[#E8F5F0] border border-[#48A987]/30 px-2 py-0.5 rounded">
                                 {product.category}
                               </span>
                             )}
-                            <h3 className="text-[13px] font-extrabold text-[#1F261E]">
+                            <h3 className="text-[13px] font-extrabold text-[#1D2523]">
                               {product.name}
                             </h3>
                           </div>
@@ -494,7 +430,7 @@ export const QuotationPreview: React.FC<QuotationPreviewProps> = ({ doc, preview
                           >
                             <div className={`${isOrderMode ? 'col-span-5' : 'col-span-6'} pr-2`}>
                               <div className="flex items-start gap-1.5">
-                                <span className="text-[#EBA552] font-bold mt-0.5">▸</span>
+                                <span className="text-[#48A987] font-bold mt-0.5">▸</span>
                                 <div>
                                   <div className="font-semibold text-gray-800 leading-snug">
                                     {v.variantLabel || 'Estándar'}
@@ -509,7 +445,7 @@ export const QuotationPreview: React.FC<QuotationPreviewProps> = ({ doc, preview
                             </div>
 
                             <div className="col-span-3 text-center px-1">
-                              <span className="inline-block bg-gray-100 border border-gray-300 text-[#1F261E] font-bold text-[10.5px] px-2 py-0.5 rounded">
+                              <span className="inline-block bg-gray-100 border border-gray-300 text-[#1D2523] font-bold text-[10.5px] px-2 py-0.5 rounded">
                                 {v.sizeLabel || 'S - M - L'}
                               </span>
                               {breakdownStr && (
@@ -527,7 +463,7 @@ export const QuotationPreview: React.FC<QuotationPreviewProps> = ({ doc, preview
                                 <div className="col-span-1 text-right font-mono text-gray-700">
                                   {Number(v.unitPrice || 0).toFixed(2)}
                                 </div>
-                                <div className="col-span-2 text-right font-mono font-bold text-[#1F261E]">
+                                <div className="col-span-2 text-right font-mono font-bold text-[#1D2523]">
                                   {formatMoney(rowTotal, doc.currency)}
                                 </div>
                               </>
@@ -536,7 +472,7 @@ export const QuotationPreview: React.FC<QuotationPreviewProps> = ({ doc, preview
                                 <div className="col-span-1 text-center text-[10px] text-gray-500 font-medium">
                                   {v.minOrderLabel || (v.quantity ? `${v.quantity} und` : '—')}
                                 </div>
-                                <div className="col-span-2 text-right font-mono font-extrabold text-[#1F261E] text-[12px]">
+                                <div className="col-span-2 text-right font-mono font-extrabold text-[#1D2523] text-[12px]">
                                   {formatMoney(v.unitPrice, doc.currency)}
                                 </div>
                               </>
@@ -573,14 +509,14 @@ export const QuotationPreview: React.FC<QuotationPreviewProps> = ({ doc, preview
             <div className="grid grid-cols-12 gap-5 items-start">
               {/* Left Column: Amount in words + Total units + Advance payment schedule */}
               <div className="col-span-7 space-y-2">
-                <div className="bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-[10.5px] font-bold text-[#1F261E] tracking-wide">
+                <div className="bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2 text-[10.5px] font-bold text-[#1D2523] tracking-wide">
                   {numberToSpanishWords(totals.grandTotal, doc.currency)}
                 </div>
 
-                <div className="flex flex-wrap items-center justify-between gap-2 bg-[#F8F5F1] border border-[#E5E0D8] rounded-lg px-3.5 py-2 text-[11px]">
+                <div className="flex flex-wrap items-center justify-between gap-2 bg-[#F7FAF8] border border-[#D8E5DF] rounded-lg px-3.5 py-2 text-[11px]">
                   <div>
                     <span className="text-gray-600 font-medium">Volumen Total de Confección: </span>
-                    <span className="font-extrabold text-[#1F261E] font-mono">
+                    <span className="font-extrabold text-[#1D2523] font-mono">
                       {totals.totalUnits} prendas
                     </span>{' '}
                     <span className="text-gray-500 text-[10px]">
@@ -591,10 +527,10 @@ export const QuotationPreview: React.FC<QuotationPreviewProps> = ({ doc, preview
                   {doc.terms.showAdvanceCalculation && doc.terms.advancePercent > 0 && (
                     <div className="flex items-center gap-3 text-[10.5px] border-t sm:border-t-0 pt-1 sm:pt-0 border-gray-200">
                       <span>
-                        <strong className="text-[#9A6522]">
+                        <strong className="text-[#2E7A60]">
                           Adelanto ({doc.terms.advancePercent}%):
                         </strong>{' '}
-                        <span className="font-mono font-bold text-[#1F261E]">
+                        <span className="font-mono font-bold text-[#1D2523]">
                           {formatMoney(totals.advanceAmount, doc.currency)}
                         </span>
                       </span>
@@ -654,8 +590,8 @@ export const QuotationPreview: React.FC<QuotationPreviewProps> = ({ doc, preview
                   <div
                     className={`px-3.5 py-2.5 flex justify-between items-center ${
                       isCorporate
-                        ? 'bg-[#1F261E] text-white'
-                        : 'bg-gray-100 text-[#1F261E] border-t-2 border-[#1F261E]'
+                        ? 'bg-[#1D2523] text-white'
+                        : 'bg-[#E8F5F0] text-[#1D2523] border-t-2 border-[#48A987]'
                     }`}
                   >
                     <div>
@@ -664,7 +600,7 @@ export const QuotationPreview: React.FC<QuotationPreviewProps> = ({ doc, preview
                       </span>
                       <span
                         className={`block text-[9.5px] ${
-                          isCorporate ? 'text-[#EBA552]' : 'text-gray-600'
+                          isCorporate ? 'text-[#48A987]' : 'text-[#2E7A60]'
                         }`}
                       >
                         {taxLabel}
@@ -678,9 +614,9 @@ export const QuotationPreview: React.FC<QuotationPreviewProps> = ({ doc, preview
               </div>
             </div>
           ) : (
-            <div className="bg-[#F8F5F1] border border-[#E5E0D8] rounded-lg px-4 py-2.5 flex items-center justify-between text-[11px]">
+            <div className="bg-[#F7FAF8] border border-[#D8E5DF] rounded-lg px-4 py-2.5 flex items-center justify-between text-[11px]">
               <div>
-                <span className="font-bold text-[#1F261E]">
+                <span className="font-bold text-[#1D2523]">
                   Modalidad Tarifario / Precios Unitarios por Talla y Variante:
                 </span>{' '}
                 <span className="text-gray-700">
@@ -701,32 +637,32 @@ export const QuotationPreview: React.FC<QuotationPreviewProps> = ({ doc, preview
           <div className={doc.terms.showSignature ? 'col-span-8 space-y-3' : 'col-span-12 space-y-3'}>
             {/* Commercial Terms */}
             <div>
-              <h4 className="text-[10.5px] font-extrabold uppercase tracking-wider text-[#1F261E] mb-1.5 flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-[#EBA552] inline-block"></span>
+              <h4 className="text-[10.5px] font-extrabold uppercase tracking-wider text-[#1D2523] mb-1.5 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#48A987] inline-block"></span>
                 Condiciones Comerciales y de Producción
               </h4>
               <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10.5px] text-gray-700 bg-gray-50/80 border border-gray-200 rounded-lg p-2.5">
                 {doc.terms.paymentTerms && (
                   <div className="col-span-2">
-                    <span className="font-bold text-[#1F261E]">• Forma de Pago: </span>
+                    <span className="font-bold text-[#1D2523]">• Forma de Pago: </span>
                     <span>{doc.terms.paymentTerms}</span>
                   </div>
                 )}
                 {doc.terms.deliveryTime && (
                   <div className="col-span-2">
-                    <span className="font-bold text-[#1F261E]">• Plazo de Entrega: </span>
+                    <span className="font-bold text-[#1D2523]">• Plazo de Entrega: </span>
                     <span>{doc.terms.deliveryTime}</span>
                   </div>
                 )}
                 {doc.terms.deliveryPlace && (
                   <div className="col-span-2">
-                    <span className="font-bold text-[#1F261E]">• Entrega / Envío: </span>
+                    <span className="font-bold text-[#1D2523]">• Entrega / Envío: </span>
                     <span>{doc.terms.deliveryPlace}</span>
                   </div>
                 )}
                 {doc.terms.warrantyAndSamples && (
                   <div className="col-span-2">
-                    <span className="font-bold text-[#1F261E]">• Muestras y Garantía: </span>
+                    <span className="font-bold text-[#1D2523]">• Muestras y Garantía: </span>
                     <span>{doc.terms.warrantyAndSamples}</span>
                   </div>
                 )}
@@ -742,8 +678,8 @@ export const QuotationPreview: React.FC<QuotationPreviewProps> = ({ doc, preview
             {/* Bank Accounts */}
             {doc.terms.showBankAccounts && enabledBanks.length > 0 && (
               <div>
-                <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-[#1F261E] mb-1 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-[#1F261E] inline-block"></span>
+                <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-[#1D2523] mb-1 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#1D2523] inline-block"></span>
                   Cuentas Bancarias Autorizadas ({doc.company.legalName})
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -752,7 +688,7 @@ export const QuotationPreview: React.FC<QuotationPreviewProps> = ({ doc, preview
                       key={bank.id}
                       className="border border-gray-200 rounded px-2.5 py-1.5 bg-white text-[9.5px]"
                     >
-                      <div className="font-extrabold text-[#1F261E] truncate">{bank.bankName}</div>
+                      <div className="font-extrabold text-[#1D2523] truncate">{bank.bankName}</div>
                       <div className="text-gray-500 text-[9px]">{bank.accountType}</div>
                       <div className="font-mono font-bold text-gray-800 mt-0.5">
                         N°: {bank.accountNumber}
@@ -783,12 +719,12 @@ export const QuotationPreview: React.FC<QuotationPreviewProps> = ({ doc, preview
                   </span>
                 </div>
               )}
-              <div className="w-48 border-t border-[#1F261E] pt-1.5">
-                <div className="font-bold text-[11px] text-[#1F261E]">
+              <div className="w-48 border-t border-[#1D2523] pt-1.5">
+                <div className="font-bold text-[11px] text-[#1D2523]">
                   {doc.company.signerName || doc.salesperson}
                 </div>
                 <div className="text-[9.5px] text-gray-500">{doc.company.signerRole}</div>
-                <div className="text-[9px] font-mono text-[#9A6522] font-semibold mt-0.5">
+                <div className="text-[9px] font-mono text-[#2E7A60] font-semibold mt-0.5">
                   {doc.company.phone} · {doc.company.email}
                 </div>
               </div>
@@ -799,7 +735,7 @@ export const QuotationPreview: React.FC<QuotationPreviewProps> = ({ doc, preview
         {/* Footer Bar */}
         <div className="mt-4 pt-2.5 border-t border-gray-200 flex items-center justify-between text-[9.5px] text-gray-500">
           <span>
-            <strong>{doc.company.brandName}</strong> — Especialistas en Confección de Prendas Corporativas, Industriales y Publicitarias.
+            <strong>{doc.company.brandName}</strong> — Especialistas en Fabricación de Prendas de Vestir, Confección Corporativa e Industrial.
           </span>
           <span className="font-mono">
             {doc.company.website} | {doc.company.phone}

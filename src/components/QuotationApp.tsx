@@ -44,7 +44,8 @@ import {
   exportElementAsPng,
 } from '../utils/exporter';
 import { ProductEditorCard } from './ProductEditorCard';
-import { QuotationPreview, SukitexLogoSvg } from './QuotationPreview';
+import { QuotationPreview, SukitexLogoImg } from './QuotationPreview';
+import { SUKITEX_LOGO_DATA_URL } from '../data/logoBase64';
 
 const STORAGE_KEY_CURRENT = 'sukitex_current_quotation_v1';
 const STORAGE_KEY_HISTORY = 'sukitex_quotation_history_v1';
@@ -81,13 +82,23 @@ export const QuotationApp: React.FC = () => {
   // Load saved state on mount
   useEffect(() => {
     try {
-      const rawCurrent = localStorage.getItem(STORAGE_KEY_CURRENT);
-      if (rawCurrent) {
-        const parsed = JSON.parse(rawCurrent);
-        if (parsed && parsed.products) {
-          setDoc(parsed);
-        }
-      } else {
+        const rawCurrent = localStorage.getItem(STORAGE_KEY_CURRENT);
+        if (rawCurrent) {
+          const parsed = JSON.parse(rawCurrent);
+          if (parsed && parsed.products) {
+            // Ensure company logoUrl reflects the official SUKITEX logo if it was using old placeholder
+            if (!parsed.company?.logoUrl || parsed.company.logoUrl.startsWith('data:image/svg')) {
+              parsed.company = {
+                ...parsed.company,
+                logoUrl: SUKITEX_LOGO_DATA_URL,
+                brandName: 'SUKITEX S.A.C.',
+                tagline: 'Fabricación de Prendas de Vestir',
+                legalName: parsed.company.legalName || 'SUKITEX S.A.C.',
+              };
+            }
+            setDoc(parsed);
+          }
+        } else {
         // Check if company defaults were saved previously
         const rawCompany = localStorage.getItem(STORAGE_KEY_COMPANY_DEFAULTS);
         if (rawCompany) {
@@ -449,30 +460,36 @@ export const QuotationApp: React.FC = () => {
     <div className="min-h-screen bg-[#F3F0EA] text-[#1F261E] flex flex-col">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-5 right-5 z-50 bg-[#1F261E] text-white border-l-4 border-[#EBA552] px-4 py-3 rounded-lg shadow-xl flex items-center gap-2.5 text-xs font-semibold animate-bounce print:hidden">
-          <Check className="w-4 h-4 text-[#EBA552] shrink-0" />
+        <div className="fixed bottom-5 right-5 z-50 bg-[#1D2523] text-white border-l-4 border-[#48A987] px-4 py-3 rounded-lg shadow-xl flex items-center gap-2.5 text-xs font-semibold animate-bounce print:hidden">
+          <Check className="w-4 h-4 text-[#48A987] shrink-0" />
           <span>{toastMessage}</span>
         </div>
       )}
 
       {/* TOP COMMAND HEADER (Hidden on Print) */}
-      <header className="bg-[#1F261E] text-white border-b-2 border-[#EBA552] sticky top-0 z-30 shadow-md print:hidden">
+      <header className="bg-[#1D2523] text-white border-b-2 border-[#48A987] sticky top-0 z-30 shadow-md print:hidden">
         <div className="max-w-[1800px] mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
           {/* Brand Title */}
           <div className="flex items-center gap-3">
-            <SukitexLogoSvg darkBg={true} className="scale-90 origin-left" />
+            <div className="bg-white/95 rounded-lg px-2.5 py-1 shadow-sm flex items-center">
+              <img
+                src={SUKITEX_LOGO_DATA_URL}
+                alt="SUKITEX S.A.C."
+                className="h-9 max-w-[170px] object-contain"
+              />
+            </div>
             <div className="hidden md:block border-l border-white/15 pl-3">
-              <span className="text-xs font-bold text-[#EBA552] block">
+              <span className="text-xs font-bold text-[#48A987] block">
                 Sistema de Cotizaciones B2B
               </span>
-              <span className="text-[11px] text-gray-400">
-                Confección de Prendas Corporativas & Uniformes
+              <span className="text-[11px] text-gray-300">
+                Fabricación de Prendas de Vestir & Uniformes
               </span>
             </div>
           </div>
 
           {/* Quick Document Mode & Theme Controls */}
-          <div className="flex flex-wrap items-center gap-2 bg-[#2A3329] p-1.5 rounded-lg border border-white/10">
+          <div className="flex flex-wrap items-center gap-2 bg-[#26312E] p-1.5 rounded-lg border border-white/10">
             {/* Mode Switcher */}
             <div className="flex rounded bg-black/25 p-0.5 text-xs">
               <button
@@ -480,7 +497,7 @@ export const QuotationApp: React.FC = () => {
                 onClick={() => setDoc((prev) => ({ ...prev, mode: 'order' }))}
                 className={`px-2.5 py-1 rounded font-bold transition ${
                   doc.mode === 'order'
-                    ? 'bg-[#EBA552] text-[#1F261E]'
+                    ? 'bg-[#48A987] text-white shadow'
                     : 'text-gray-300 hover:text-white'
                 }`}
               >
@@ -491,7 +508,7 @@ export const QuotationApp: React.FC = () => {
                 onClick={() => setDoc((prev) => ({ ...prev, mode: 'pricelist' }))}
                 className={`px-2.5 py-1 rounded font-bold transition ${
                   doc.mode === 'pricelist'
-                    ? 'bg-[#EBA552] text-[#1F261E]'
+                    ? 'bg-[#48A987] text-white shadow'
                     : 'text-gray-300 hover:text-white'
                 }`}
               >
@@ -508,12 +525,12 @@ export const QuotationApp: React.FC = () => {
                   currency: e.target.value as 'PEN' | 'USD',
                 }))
               }
-              className="bg-black/25 text-white text-xs font-bold px-2.5 py-1.5 rounded border border-white/10 focus:outline-none focus:border-[#EBA552]"
+              className="bg-black/25 text-white text-xs font-bold px-2.5 py-1.5 rounded border border-white/10 focus:outline-none focus:border-[#48A987]"
             >
-              <option value="PEN" className="bg-[#1F261E]">
+              <option value="PEN" className="bg-[#1D2523]">
                 S/ Soles (PEN)
               </option>
-              <option value="USD" className="bg-[#1F261E]">
+              <option value="USD" className="bg-[#1D2523]">
                 US$ Dólares (USD)
               </option>
             </select>
@@ -527,15 +544,15 @@ export const QuotationApp: React.FC = () => {
                   taxMode: e.target.value as 'plus_igv' | 'inc_igv' | 'no_igv',
                 }))
               }
-              className="bg-black/25 text-white text-xs font-bold px-2.5 py-1.5 rounded border border-white/10 focus:outline-none focus:border-[#EBA552]"
+              className="bg-black/25 text-white text-xs font-bold px-2.5 py-1.5 rounded border border-white/10 focus:outline-none focus:border-[#48A987]"
             >
-              <option value="plus_igv" className="bg-[#1F261E]">
+              <option value="plus_igv" className="bg-[#1D2523]">
                 Precios + IGV (18%)
               </option>
-              <option value="inc_igv" className="bg-[#1F261E]">
+              <option value="inc_igv" className="bg-[#1D2523]">
                 Incluye IGV (18%)
               </option>
-              <option value="no_igv" className="bg-[#1F261E]">
+              <option value="no_igv" className="bg-[#1D2523]">
                 Sin IGV (Valor Neto)
               </option>
             </select>
@@ -549,12 +566,12 @@ export const QuotationApp: React.FC = () => {
                   theme: prev.theme === 'corporate' ? 'clean' : 'corporate',
                 }))
               }
-              className="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1.5 rounded bg-white/10 hover:bg-white/20 text-[#EBA552] transition"
+              className="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1.5 rounded bg-white/10 hover:bg-white/20 text-[#48A987] transition"
               title="Alternar entre diseño Corporativo Oscuro y diseño Blanco para impresión"
             >
               <Palette className="w-3.5 h-3.5" />
               <span>
-                {doc.theme === 'corporate' ? 'Tema: SUKITEX' : 'Tema: Impresión Limpia'}
+                {doc.theme === 'corporate' ? 'Tema: Corporativo' : 'Tema: Impresión Limpia'}
               </span>
             </button>
           </div>
@@ -567,7 +584,7 @@ export const QuotationApp: React.FC = () => {
               className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition"
               title="Guardar cotización actual en el navegador"
             >
-              <Save className="w-3.5 h-3.5 text-[#EBA552]" />
+              <Save className="w-3.5 h-3.5 text-[#48A987]" />
               <span className="hidden sm:inline">Guardar</span>
             </button>
 
@@ -576,7 +593,7 @@ export const QuotationApp: React.FC = () => {
               onClick={() => setHistoryModalOpen(true)}
               className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition"
             >
-              <FolderClock className="w-3.5 h-3.5 text-[#EBA552]" />
+              <FolderClock className="w-3.5 h-3.5 text-[#48A987]" />
               <span className="hidden sm:inline">Historial ({historyList.length})</span>
             </button>
 
@@ -584,7 +601,7 @@ export const QuotationApp: React.FC = () => {
               type="button"
               onClick={handleDownloadPng}
               disabled={exportingType !== null}
-              className="inline-flex items-center gap-1.5 text-xs font-extrabold px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white shadow transition disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 text-xs font-extrabold px-3.5 py-2 rounded-lg bg-[#2E7A60] hover:bg-[#256650] text-white shadow transition disabled:opacity-50"
               title="Descargar como Imagen PNG en Alta Resolución (ideal para WhatsApp)"
             >
               {exportingType === 'png' ? (
@@ -599,7 +616,7 @@ export const QuotationApp: React.FC = () => {
               type="button"
               onClick={handleDownloadPdf}
               disabled={exportingType !== null}
-              className="inline-flex items-center gap-1.5 text-xs font-extrabold px-3.5 py-2 rounded-lg bg-[#EBA552] hover:bg-[#d9933f] text-[#1F261E] shadow transition disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 text-xs font-extrabold px-3.5 py-2 rounded-lg bg-[#48A987] hover:bg-[#3d9173] text-white shadow transition disabled:opacity-50"
               title="Descargar archivo PDF A4 directo"
             >
               {exportingType === 'pdf' ? (
