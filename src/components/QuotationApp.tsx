@@ -61,6 +61,9 @@ export const QuotationApp: React.FC = () => {
   const [zoom, setZoom] = useState<number>(0.78);
   const [catalogModalOpen, setCatalogModalOpen] = useState<boolean>(false);
   const [historyModalOpen, setHistoryModalOpen] = useState<boolean>(false);
+  const [jsonModalOpen, setJsonModalOpen] = useState<boolean>(false);
+  const [jsonInputText, setJsonInputText] = useState<string>('');
+  const [jsonParseError, setJsonParseError] = useState<string | null>(null);
 
   const [historyList, setHistoryList] = useState<QuotationDocument[]>([]);
   const [customPresets, setCustomPresets] = useState<CatalogPreset[]>([]);
@@ -386,6 +389,34 @@ export const QuotationApp: React.FC = () => {
     showToast('Respaldo JSON descargado');
   };
 
+  const handleApplyJsonText = () => {
+    setJsonParseError(null);
+    if (!jsonInputText.trim()) {
+      setJsonParseError('Por favor pega el código JSON de la cotización.');
+      return;
+    }
+    try {
+      const parsed = JSON.parse(jsonInputText);
+      if (!parsed || !Array.isArray(parsed.products)) {
+        setJsonParseError('El JSON debe contener al menos un arreglo de "products".');
+        return;
+      }
+      // Ensure company logo remains if not specified
+      if (!parsed.company?.logoUrl) {
+        parsed.company = {
+          ...parsed.company,
+          logoUrl: SUKITEX_LOGO_DATA_URL,
+        };
+      }
+      setDoc(parsed);
+      setJsonModalOpen(false);
+      setJsonInputText('');
+      showToast(`Cotización ${parsed.number || ''} importada y aplicada exitosamente`);
+    } catch (err: any) {
+      setJsonParseError(`Error de sintaxis JSON: ${err?.message || 'Formato inválido'}`);
+    }
+  };
+
   const handleImportJson = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -578,6 +609,19 @@ export const QuotationApp: React.FC = () => {
 
           {/* Export & History Buttons */}
           <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setJsonParseError(null);
+                setJsonModalOpen(true);
+              }}
+              className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-lg bg-[#48A987] hover:bg-[#3d9173] text-white shadow transition"
+              title="Pegar código JSON directo para cargar la cotización de inmediato"
+            >
+              <FileJson className="w-3.5 h-3.5" />
+              <span>Pegar JSON</span>
+            </button>
+
             <button
               type="button"
               onClick={saveToHistory}
@@ -1956,6 +2000,102 @@ export const QuotationApp: React.FC = () => {
                   })}
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 3: PEGAR / IMPORTAR JSON */}
+      {jsonModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 print:hidden">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-gray-200">
+            <div className="bg-[#1D2523] text-white px-6 py-4 flex items-center justify-between border-b-2 border-[#48A987]">
+              <div>
+                <h3 className="text-base font-extrabold flex items-center gap-2">
+                  <FileJson className="w-5 h-5 text-[#48A987]" />
+                  Pegar / Cargar Código JSON
+                </h3>
+                <p className="text-xs text-gray-300">
+                  Pega el JSON de tu cotización para aplicarla y ver los resultados en la hoja A4 al instante.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setJsonModalOpen(false)}
+                className="text-gray-300 hover:text-white text-xl font-bold px-2"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto space-y-4">
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-bold text-gray-700">
+                    Código JSON de la Cotización:
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setJsonInputText(JSON.stringify(doc, null, 2));
+                      setJsonParseError(null);
+                    }}
+                    className="text-[11px] font-semibold text-[#2E7A60] hover:underline"
+                  >
+                    Copiar estructura actual como plantilla
+                  </button>
+                </div>
+                <textarea
+                  rows={14}
+                  value={jsonInputText}
+                  onChange={(e) => {
+                    setJsonInputText(e.target.value);
+                    if (jsonParseError) setJsonParseError(null);
+                  }}
+                  placeholder='Pega aquí el JSON completo, por ejemplo:
+{
+  "number": "COT-2026-002",
+  "mode": "pricelist",
+  "products": [ ... ]
+}'
+                  className="w-full px-3.5 py-2.5 font-mono text-xs bg-gray-50 border border-gray-300 rounded-xl focus:outline-none focus:border-[#48A987] focus:bg-white text-gray-800"
+                />
+              </div>
+
+              {jsonParseError && (
+                <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-lg font-medium">
+                  {jsonParseError}
+                </div>
+              )}
+
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => jsonInputRef.current?.click()}
+                  className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 transition"
+                >
+                  <Upload className="w-3.5 h-3.5" />
+                  <span>O subir archivo .json</span>
+                </button>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setJsonModalOpen(false)}
+                    className="px-4 py-2 text-xs font-bold text-gray-600 hover:text-gray-800"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleApplyJsonText}
+                    className="inline-flex items-center gap-1.5 text-xs font-extrabold bg-[#48A987] hover:bg-[#3d9173] text-white px-5 py-2 rounded-lg shadow transition"
+                  >
+                    <Check className="w-4 h-4" />
+                    <span>Cargar y Ver Cotización</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
